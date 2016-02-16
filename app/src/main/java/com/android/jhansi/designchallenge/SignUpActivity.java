@@ -80,9 +80,14 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             case 0:
                 GreetingFragment greetingFragment = new GreetingFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragmentholder,greetingFragment);
+                fragmentTransaction.replace(R.id.fragmentholder, greetingFragment);
                 fragmentTransaction.commit();
                 break;
+            case 1: //map
+                MapFragment mapFragment = new MapFragment();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentholder,mapFragment);
+                fragmentTransaction.commit();
             default:
                 break;
         }
@@ -136,6 +141,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             showCustomToast(R.drawable.invalid_email_banner_r);
         }else if (!isNetworkConnectionAvailable()){
             showCustomToast(R.drawable.no_internet_connection_banner_r);
+        }else{
+            loadSelection(1);
         }
 
     }
