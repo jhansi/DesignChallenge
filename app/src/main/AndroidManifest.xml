@@ -17,8 +17,9 @@
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBHZKQcY7MKP9jYyh5Uuj6tyr-pgJkx0S0"/>
 
-        <activity android:name=".NavigationDrawerActivity">
-
+        <activity android:name=".NavigationDrawerActivity"
+            android:configChanges="orientation|screenSize">
+            <!--android:configChanges="orientation|keyboardHidden">-->
              <!--<intent-filter>-->
              <!--<action android:name="android.intent.action.MAIN" />-->
 

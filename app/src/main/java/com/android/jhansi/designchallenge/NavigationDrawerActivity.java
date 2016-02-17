@@ -2,6 +2,7 @@ package com.android.jhansi.designchallenge;
 
 import android.content.Context;
 
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.FragmentManager;
@@ -10,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.CameraPosition;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,11 +36,15 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
 
     private DrawerLayout drawerLayout;
     private ListView navList;
-
+    private ArrayAdapter<String> adapter;
 
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
     private int FragmentToBeLoaded;
+
+    public static final String TAG = NavigationDrawerActivity.class.getSimpleName();
+
+    private CameraPosition cp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +71,7 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
 
 
         navList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.layout_listitem,navArray);
+        adapter = new ArrayAdapter<String>(this,R.layout.layout_listitem,navArray);
         navList.setAdapter(adapter);
         navList.setOnItemClickListener(this);
 
@@ -78,35 +87,55 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         navList.setItemChecked(i,true);
         switch (i) {
             case CommonUtil.GreetingFragment:
+                //this.getFragmentManager().popBackStack();
                 GreetingFragment greetingFragment = new GreetingFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragmentholder, greetingFragment);
                 fragmentTransaction.commit();
                 break;
             case CommonUtil.MapsFragment:
+                //this.getFragmentManager().popBackStack();
                 MapFragment mapFragment = new MapFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragmentholder,mapFragment);
                 fragmentTransaction.commit();
+                break;
+            case CommonUtil.AboutFragment:
+              //  this.getFragmentManager().popBackStack();
+                AboutFragment aboutFragment = new AboutFragment();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragmentholder, aboutFragment);
+                fragmentTransaction.commit();
+                break;
+
             default:
                 break;
         }
     }
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        drawerLayout.closeDrawers();
         switch(position){
 
             case 0:
                 drawerLayout.closeDrawers();
                 break;
             case 1:
+                if(CommonUtil.isPreferencesSet(this)){
+                    loadSelection(CommonUtil.MapsFragment);
+                }else{
+                    loadSelection(CommonUtil.GreetingFragment);
+                }
                 break;
             case 2:
+                loadSelection(CommonUtil.AboutFragment);
                 break;
             case 3:
+                CommonUtil.deleteUserData();
+                Intent intent = new Intent(this,SplashScreen.class);
+                startActivity(intent);
+                finish();
                 break;
             default:
                 drawerLayout.closeDrawers();
@@ -119,20 +148,20 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
 
     public void onClickMenu(View view) {
 
-        String[] myResArray;
         if(CommonUtil.isPreferencesSet(this)) {
-            FragmentToBeLoaded = CommonUtil.MapsFragment;
-            myResArray = getResources().getStringArray(R.array.nav_menu_logout);
-        }else{
-            FragmentToBeLoaded = CommonUtil.GreetingFragment;
-            myResArray = getResources().getStringArray(R.array.nav_menu);
+            Log.i(TAG, "preference is set");
+            Log.i(TAG, "(adapter.getCount(): "+ adapter.getCount());
+           if(adapter.getCount() == 3){
+               Log.i(TAG, "(adapter.getCount(): "+ adapter.getCount());
+               adapter.insert(getResources().getString(R.string.logout), 3);
+               adapter.notifyDataSetChanged();
+           }
+
+                       // add(String.valueOf(R.string.logout));
+           // }
+
+
         }
-
-        List<String> myResArrayList = Arrays.asList(myResArray);
-        ArrayList<String> navArray = new ArrayList<String>(myResArrayList);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.layout_listitem,navArray);
-        navList.setAdapter(adapter);
 
         drawerLayout.openDrawer(GravityCompat.START);
         View viewKeyBoard = this.getCurrentFocus();

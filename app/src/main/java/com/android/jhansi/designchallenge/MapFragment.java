@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -55,6 +57,8 @@ public class MapFragment extends Fragment implements
     private TextView textViewUserInfo;
     private TextView textViewAddress;
 
+    private CameraPosition cp;
+
     public static final String TAG = MapFragment.class.getSimpleName();
 
     public MapFragment() {
@@ -78,6 +82,8 @@ public class MapFragment extends Fragment implements
 
         mMapView.onResume();// needed to get the map to display immediately
 
+        // retain this fragment
+        setRetainInstance(true);
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -97,14 +103,6 @@ public class MapFragment extends Fragment implements
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-
-//
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-//                .addLocationRequest(mLocationRequest);
-//
-//        // **************************
-//        builder.setAlwaysShow(true); // this is the key ingredient
-//        // **************************
 
         textViewUserInfo = (TextView) view.findViewById(R.id.tv_user_info);
         textViewUserInfo.setText(CommonUtil.getUserName());
@@ -134,20 +132,25 @@ public class MapFragment extends Fragment implements
      * This should only be called once and when we are sure that {@link #googleMap}
      * is not null.
      */
-    private static void setUpMap() {
+    private  void setUpMap() {
         // For showing a move to my loction button
        // googleMap.setMyLocationEnabled(false);
 
         // create marker
-        MarkerOptions marker = new MarkerOptions().position(new LatLng(0, 0)).title("My Home").snippet("Home Address");
 
-
-        // Changing marker icon
-        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
+//        try {
+            MapsInitializer.initialize(getActivity());
+//        } catch (GooglePlayServicesNotAvailableException e) {
+//        }
+//        MarkerOptions marker = new MarkerOptions().position(new LatLng(37.7785, -122.4056)).title("My Home").snippet("Home Address");
+//
+//
+//        // Changing marker icon
+//        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         // For dropping a marker at a point on the Map
-        googleMap.addMarker(marker);
+        //googleMap.addMarker(marker);
 
     }
 
@@ -158,16 +161,23 @@ public class MapFragment extends Fragment implements
         mMapView.onResume();
         setUpMapIfNeeded();
         mGoogleApiClient.connect();
+        if (cp != null) {
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
+            cp = null;
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
+        cp = googleMap.getCameraPosition();
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+
+       googleMap = null;
 
     }
 
@@ -275,5 +285,6 @@ public class MapFragment extends Fragment implements
         }
         return strAdd;
     }
+
 
 }

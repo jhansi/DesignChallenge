@@ -3,6 +3,7 @@ package com.android.jhansi.designchallenge;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by Jhansi
@@ -12,6 +13,9 @@ public class CommonUtil {
     public static final int GreetingFragment = 0;
     public static final int MapsFragment = 1;
 
+    public static final int AboutFragment = 3;
+
+
     public static final String  preference_file = "com.android.jhansi.PREFERENCE_FILE_KEY";
 
     public static final String FIRST_NAME_KEY = "firstNameKey";
@@ -19,6 +23,7 @@ public class CommonUtil {
     public static final String EMAIL_KEY = "emailKey";
     public static final int exactNumberOfPreferences = 3;
 
+    public static final String TAG = CommonUtil.class.getSimpleName();
 
     private static SharedPreferences sharedpreferences;
     private static SharedPreferences.Editor editor;
@@ -27,7 +32,7 @@ public class CommonUtil {
 
     public static void initialiseSharedPreference(Context con) {
         context = con;
-        sharedpreferences = context.getSharedPreferences(CommonUtil.preference_file, Context.MODE_PRIVATE);
+        sharedpreferences = context.getApplicationContext().getSharedPreferences(CommonUtil.preference_file, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
     }
 
@@ -61,8 +66,12 @@ public class CommonUtil {
         return userName;
     }
     public static boolean isPreferencesSet(Context context){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return (sharedPreferences.getAll().size() >0 );
+        int size = sharedpreferences.getAll().size();
+        Log.i(TAG, "Size" + size);
+        return (size > 0 );
     }
 
+    public static void deleteUserData(){
+        editor.clear().commit();
+    }
 }
