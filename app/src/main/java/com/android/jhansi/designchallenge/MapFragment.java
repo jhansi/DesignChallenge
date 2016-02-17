@@ -1,17 +1,19 @@
 package com.android.jhansi.designchallenge;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -61,10 +62,14 @@ public class MapFragment extends Fragment implements
 
     public static final String TAG = MapFragment.class.getSimpleName();
 
+    /* GPS Constant Permission */
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
+
+
     public MapFragment() {
         // Required empty public constructor
     }
-
 
 
     @Override
@@ -113,7 +118,9 @@ public class MapFragment extends Fragment implements
     }
 
 
-    /***** Sets up the map if it is possible to do so *****/
+    /*****
+     * Sets up the map if it is possible to do so
+     *****/
     public void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (googleMap == null) {
@@ -128,29 +135,12 @@ public class MapFragment extends Fragment implements
     /**
      * This is where we can add markers or lines, add listeners or move the
      * camera.
-     * <p>
      * This should only be called once and when we are sure that {@link #googleMap}
      * is not null.
      */
-    private  void setUpMap() {
-        // For showing a move to my loction button
-       // googleMap.setMyLocationEnabled(false);
-
-        // create marker
-
-//        try {
-            MapsInitializer.initialize(getActivity());
-//        } catch (GooglePlayServicesNotAvailableException e) {
-//        }
-//        MarkerOptions marker = new MarkerOptions().position(new LatLng(37.7785, -122.4056)).title("My Home").snippet("Home Address");
-//
-//
-//        // Changing marker icon
-//        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
+    private void setUpMap() {
+        MapsInitializer.initialize(getActivity());
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-        // For dropping a marker at a point on the Map
-        //googleMap.addMarker(marker);
 
     }
 
@@ -177,7 +167,7 @@ public class MapFragment extends Fragment implements
             mGoogleApiClient.disconnect();
         }
 
-       googleMap = null;
+        googleMap = null;
 
     }
 
@@ -193,17 +183,59 @@ public class MapFragment extends Fragment implements
         mMapView.onLowMemory();
     }
 
+
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        Location location = null;
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSION_ACCESS_FINE_LOCATION);
+            }
+        } else {
+            LocationManager mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+
+            location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        }
+
         if (location == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-        else {
+        } else {
             handleNewLocation(location);
         }
+
     }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+//
+//        //Location location = null;
+//        switch (requestCode) {
+//            case MY_PERMISSION_ACCESS_FINE_LOCATION: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    // We can now safely use the API we requested access to
+//                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//                    }
+//                } else {
+//
+//                    // permission denied,
+//                }
+//                return;
+//            }
+//        }
+//    }
 
     private void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
@@ -213,12 +245,8 @@ public class MapFragment extends Fragment implements
 
         LatLng latLng = new LatLng(latitude, longitude);
 
-// create marker
         MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude)).title("My Home").snippet("Home Address");
 
-
-        // Changing marker icon
-       // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
         marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
 
 
@@ -235,6 +263,7 @@ public class MapFragment extends Fragment implements
         textViewAddress.setText(strAdress);
 
     }
+
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(TAG, "Location services suspended. Please reconnect.");
@@ -248,9 +277,12 @@ public class MapFragment extends Fragment implements
                 connectionResult.startResolutionForResult(getActivity(), CONNECTION_FAILURE_RESOLUTION_REQUEST);
             } catch (IntentSender.SendIntentException e) {
                 e.printStackTrace();
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
             }
         } else {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
+
         }
     }
 
@@ -270,10 +302,8 @@ public class MapFragment extends Fragment implements
                 Address returnedAddress = addresses.get(0);
                 StringBuilder strReturnedAddress = new StringBuilder("");
 
-                //for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
-                    strReturnedAddress.append(returnedAddress.getAddressLine(0)).append(" ");
-                    strReturnedAddress.append(returnedAddress.getLocality());
-                //}
+                strReturnedAddress.append(returnedAddress.getAddressLine(0)).append(" ");
+                strReturnedAddress.append(returnedAddress.getLocality());
                 strAdd = strReturnedAddress.toString();
                 Log.w(TAG, "" + strReturnedAddress.toString());
             } else {

@@ -33,4 +33,7 @@
     <string name="lname">Last Name</string>
     <string name="app_version">Application version: 1.0</string>
     <string name="author">Author: Jhansi Tavva</string>
+    <string name="ok">Ok</string>
+    <string name="gps_title">Location Services Not Active</string>
+    <string name="turn_on_gps">Please Turn on Location Services / GPS</string>
 </resources>
