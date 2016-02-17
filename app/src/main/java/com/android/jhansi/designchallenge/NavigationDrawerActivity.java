@@ -184,8 +184,8 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         if( ! isValidEmail(email)){
 
             showCustomToast(R.drawable.invalid_email_banner_r);
-//        }else if (!isNetworkConnectionAvailable()){
-//            showCustomToast(R.drawable.no_internet_connection_banner_r);
+        }else if (!isNetworkConnectionAvailable()){
+            showCustomToast(R.drawable.no_internet_connection_banner_r);
         }else{
             CommonUtil.saveToPreferences(email,fname,lname);
 

@@ -19,15 +19,18 @@
 
         <activity android:name=".NavigationDrawerActivity"
             android:configChanges="orientation|screenSize">
-            <!--android:configChanges="orientation|keyboardHidden">-->
-             <!--<intent-filter>-->
-             <!--<action android:name="android.intent.action.MAIN" />-->
-
-
-             <!--<category android:name="android.intent.category.LAUNCHER" />-->
-             <!--</intent-filter>-->
-
             <!-- Accepts URIs that begin with "http://www.android.designchallenge.com/greetings” -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
+
+                <data
+                    android:host="www.android.designchallenge.com"
+                    android:path="/greetings"
+                    android:scheme="http"></data>
+            </intent-filter>
 
 
         </activity>
