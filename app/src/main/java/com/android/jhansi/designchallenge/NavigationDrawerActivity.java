@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.maps.model.CameraPosition;
 
 import java.util.ArrayList;
@@ -42,6 +44,9 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
     private FragmentManager fragmentManager;
     private int FragmentToBeLoaded;
 
+
+    private Tracker mTracker;
+
     public static final String TAG = NavigationDrawerActivity.class.getSimpleName();
 
     private CameraPosition cp;
@@ -52,6 +57,11 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         setContentView(R.layout.activity_navigation_drawer);
 
         CommonUtil.initialiseSharedPreference(this);
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application =  ((AnalyticsApplication) getApplication());
+        mTracker = application.getDefaultTracker();
+
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerlayout);
         navList = (ListView)findViewById(R.id.navlist);
@@ -76,9 +86,6 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         navList.setOnItemClickListener(this);
 
         fragmentManager = getSupportFragmentManager();
-
-       // FragmentToBeLoaded = 1; // TODO remove it ony for testing
-
 
         loadSelection(FragmentToBeLoaded);
     }
@@ -142,8 +149,6 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
                 break;
         }
 
-        //loadSelection(position);
-
     }
 
     public void onClickMenu(View view) {
@@ -156,10 +161,6 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
                adapter.insert(getResources().getString(R.string.logout), 3);
                adapter.notifyDataSetChanged();
            }
-
-                       // add(String.valueOf(R.string.logout));
-           // }
-
 
         }
 
@@ -223,4 +224,18 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+       if(Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+           Log.i(TAG, "App Launch from Link: " + TAG);
+           mTracker.setScreenName(TAG);
+           mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+           mTracker.send(new HitBuilders.EventBuilder()
+                   .setCategory("Application Lauch")
+                   .setAction("Email Link")
+                   .build());
+       }
+    }
 }
