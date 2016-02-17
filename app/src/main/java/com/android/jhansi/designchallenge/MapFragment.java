@@ -1,14 +1,21 @@
 package com.android.jhansi.designchallenge;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,11 +26,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -43,6 +52,8 @@ public class MapFragment extends Fragment implements
 
     private GoogleApiClient mGoogleApiClient;
 
+    private TextView textViewUserInfo;
+    private TextView textViewAddress;
 
     public static final String TAG = MapFragment.class.getSimpleName();
 
@@ -73,11 +84,6 @@ public class MapFragment extends Fragment implements
             e.printStackTrace();
         }
 
-        //googleMap = mMapView.getMap();
-        //TODO get current location
-//        latitude = 26.78;
-//        longitude = 72.56;
-
         setUpMapIfNeeded(); // For setting up the MapFragment
 
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
@@ -92,6 +98,18 @@ public class MapFragment extends Fragment implements
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
+//
+//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+//                .addLocationRequest(mLocationRequest);
+//
+//        // **************************
+//        builder.setAlwaysShow(true); // this is the key ingredient
+//        // **************************
+
+        textViewUserInfo = (TextView) view.findViewById(R.id.tv_user_info);
+        textViewUserInfo.setText(CommonUtil.getUserName());
+
+        textViewAddress = (TextView) view.findViewById(R.id.tv_address);
         return view;
 
     }
@@ -118,26 +136,18 @@ public class MapFragment extends Fragment implements
      */
     private static void setUpMap() {
         // For showing a move to my loction button
-        googleMap.setMyLocationEnabled(true);
+       // googleMap.setMyLocationEnabled(false);
 
         // create marker
         MarkerOptions marker = new MarkerOptions().position(new LatLng(0, 0)).title("My Home").snippet("Home Address");
 
 
         // Changing marker icon
-        marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
+        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         // For dropping a marker at a point on the Map
         googleMap.addMarker(marker);
-
-
-//        // For zooming automatically to the Dropped PIN Location
-//        CameraPosition cameraPosition = new CameraPosition.Builder()
-//                .target(new LatLng(latitude, longitude)).zoom(12).build();
-//        googleMap.animateCamera(CameraUpdateFactory
-//                .newCameraPosition(cameraPosition));
-
 
     }
 
@@ -198,7 +208,8 @@ public class MapFragment extends Fragment implements
 
 
         // Changing marker icon
-        marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+       // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
 
 
         // For dropping a marker at a point on the Map
@@ -206,9 +217,13 @@ public class MapFragment extends Fragment implements
 
         // For zooming automatically to the Dropped PIN Location
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(12).build();
+                .target(latLng).zoom(15).build();
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
+
+        String strAdress = getCompleteAddressString(latitude, longitude);
+        textViewAddress.setText(strAdress);
+
     }
     @Override
     public void onConnectionSuspended(int i) {
@@ -229,8 +244,36 @@ public class MapFragment extends Fragment implements
         }
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
         handleNewLocation(location);
     }
+
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                //for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(0)).append(" ");
+                    strReturnedAddress.append(returnedAddress.getLocality());
+                //}
+                strAdd = strReturnedAddress.toString();
+                Log.w(TAG, "" + strReturnedAddress.toString());
+            } else {
+                Log.w(TAG, "No Address returned!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w(TAG, "Canont get Address!");
+        }
+        return strAdd;
+    }
+
 }

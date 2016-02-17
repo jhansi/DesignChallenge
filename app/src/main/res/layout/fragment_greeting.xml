@@ -56,7 +56,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:inputType="textPersonName"
+            android:inputType="textPersonName|textCapSentences"
             android:gravity="center"
             android:ems="10"
             android:id="@+id/fNameEditText"
@@ -67,12 +67,13 @@
             android:background="@color/edittext_background"
             android:hint="@string/fname"
             android:textColorHint="@android:color/darker_gray"
+
              />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:inputType="textPersonName"
+            android:inputType="textPersonName|textCapSentences"
             android:hint="@string/lname"
             android:textColorHint="@android:color/darker_gray"
             android:ems="10"

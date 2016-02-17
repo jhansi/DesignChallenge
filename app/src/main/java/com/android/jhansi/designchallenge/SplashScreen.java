@@ -17,7 +17,7 @@ public class SplashScreen extends AppCompatActivity {
 
     //Start signup activity and finish splash activity
     public void openMainActivity() {
-        Intent intent = new Intent(SplashScreen.this,SignUpActivity.class);
+        Intent intent = new Intent(SplashScreen.this,NavigationDrawerActivity.class);
         startActivity(intent);
         finish();
     }
