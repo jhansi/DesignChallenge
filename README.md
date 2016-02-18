@@ -41,4 +41,5 @@ DesignChallange is currently built to work with Android API 23(Marshmallow). **H
 ## Usage Instructions
 DesignChallange application is developed as a part of codding challange. Once the user sucessfully logged in with a valid email ID they can see their current location. If GPS is not active, user will be prompted with settings screen to activate the location services please turn on.
 
-
+##License
+[License](https://github.com/jhansi/DesignChallenge/blob/master/LICENSE-2.0.txt)
