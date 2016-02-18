@@ -39,6 +39,6 @@ using **[GET A KEY]** and replace that in `com.google.android.geo.API_KEY` value
 DesignChallange is currently built to work with Android API 23(Marshmallow). **However**, DesignChallange's minimum SDK support is 15(Ice Cream Sandwich).
 
 ## Usage Instructions
-DesignChallange application is developed as a part of codding challange. Once the user sucessfully logs in with a valid email ID they can see their current location.
+DesignChallange application is developed as a part of codding challange. Once the user sucessfully logged in with a valid email ID they can see their current location. If GPS is not active, user will be prompted with settings screen to activate the location services please turn on.
 
 
