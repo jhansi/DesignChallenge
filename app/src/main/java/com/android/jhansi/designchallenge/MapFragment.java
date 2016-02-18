@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
@@ -230,29 +232,7 @@ public class MapFragment extends Fragment implements
         }
 
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-//
-//        //Location location = null;
-//        switch (requestCode) {
-//            case MY_PERMISSION_ACCESS_FINE_LOCATION: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//
-//                    // We can now safely use the API we requested access to
-//                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//                    }
-//                } else {
-//
-//                    // permission denied,
-//                }
-//                return;
-//            }
-//        }
-//    }
-
+    
     private void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
@@ -261,21 +241,35 @@ public class MapFragment extends Fragment implements
 
         LatLng latLng = new LatLng(latitude, longitude);
 
-        MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude)).title("My Home").snippet("Home Address");
 
-        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latitude, longitude));
+        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_2_9_location_pin));
 
+        // For dropping a markerOptions at a point on the Map
+        Marker gmapMarker= googleMap.addMarker(markerOptions);
 
-        // For dropping a marker at a point on the Map
-        googleMap.addMarker(marker);
+        final String strAdress = getCompleteAddressString(latitude, longitude);
 
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            public View getInfoWindow(Marker arg0) {
+                View v = getActivity().getLayoutInflater().inflate(R.layout.custom_infowindow, null);
+                TextView textView_address = (TextView)v.findViewById(R.id.info_address);
+                textView_address.setText(strAdress);
+                return v;
+            }
+
+            public View getInfoContents(Marker arg0) {
+                return null;
+
+            }
+        });
+
+        gmapMarker.showInfoWindow();
         // For zooming automatically to the Dropped PIN Location
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(15).build();
-        googleMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(cameraPosition));
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        String strAdress = getCompleteAddressString(latitude, longitude);
         textViewAddress.setText(strAdress);
 
     }
