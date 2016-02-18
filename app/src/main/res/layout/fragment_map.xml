@@ -27,7 +27,8 @@
             android:drawableTop="@drawable/ic_menu_icon"
             android:src="@drawable/ic_menu_icon"
             android:onClick="onClickMenu"
-            android:clickable="true" />
+            android:clickable="true"
+            android:contentDescription="@string/app_name"/>
 
         <TextView
             android:layout_width="match_parent"

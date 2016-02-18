@@ -21,9 +21,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-/**
- * Created by Jhansi
- */
 public class CommonUtil {
 
     public static final int GreetingFragment = 0;

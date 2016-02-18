@@ -63,25 +63,21 @@ public class MapFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    private static View view;
-
     MapView mMapView;
     private static GoogleMap googleMap;
-    private static Double latitude, longitude;
     private LocationRequest mLocationRequest;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     private GoogleApiClient mGoogleApiClient;
 
-    private TextView textViewUserInfo;
     private TextView textViewAddress;
 
     private CameraPosition cp;
 
     public static final String TAG = MapFragment.class.getSimpleName();
 
+    private  View view;
     /* GPS Constant Permission */
-    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
 
 
@@ -123,9 +119,9 @@ public class MapFragment extends Fragment implements
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setFastestInterval(1000); // 1 second, in milliseconds
 
-        textViewUserInfo = (TextView) view.findViewById(R.id.tv_user_info);
+        TextView textViewUserInfo = (TextView) view.findViewById(R.id.tv_user_info);
         textViewUserInfo.setText(CommonUtil.getUserName());
 
         textViewAddress = (TextView) view.findViewById(R.id.tv_address);
@@ -173,7 +169,7 @@ public class MapFragment extends Fragment implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-        googleMap = null;
+       // googleMap = null;
     }
 
     @Override
@@ -196,8 +192,8 @@ public class MapFragment extends Fragment implements
         Location location = null;
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-            } else {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+            //} else {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
             }
         } else {
@@ -222,6 +218,7 @@ public class MapFragment extends Fragment implements
     private void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
+        Double latitude, longitude;
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 

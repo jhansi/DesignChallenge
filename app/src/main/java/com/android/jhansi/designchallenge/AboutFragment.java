@@ -30,7 +30,6 @@ import android.widget.TextView;
  */
 public class AboutFragment extends Fragment {
 
-    private static View view;
     public AboutFragment() {
         // Required empty public constructor
     }
@@ -41,7 +40,7 @@ public class AboutFragment extends Fragment {
                              Bundle savedInstanceState) {
         // retain this fragment
         setRetainInstance(true);
-
+        View view;
         String versionName = BuildConfig.VERSION_NAME;
         view = inflater.inflate(R.layout.fragment_about, container, false);
         TextView textViewVersion = (TextView)view.findViewById(R.id.versionTextView );

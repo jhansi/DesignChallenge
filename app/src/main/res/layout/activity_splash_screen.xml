@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/splash"
         android:background="@drawable/ixonos_logo_small"
+        android:contentDescription="@string/app_name"
         />
 
     <TextView

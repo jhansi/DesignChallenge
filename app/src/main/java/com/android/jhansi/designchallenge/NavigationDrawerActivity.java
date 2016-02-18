@@ -42,7 +42,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.maps.model.CameraPosition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,16 +55,12 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
     private ListView navList;
     private ArrayAdapter<String> adapter;
 
-    private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
-    private int FragmentToBeLoaded;
-
 
     private Tracker mTracker;
 
     public static final String TAG = NavigationDrawerActivity.class.getSimpleName();
 
-    private CameraPosition cp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +78,7 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         navList = (ListView)findViewById(R.id.navlist);
 
         String[] myResArray;
+        int FragmentToBeLoaded;
 
         if(CommonUtil.isPreferencesSet(this)) {
             FragmentToBeLoaded = CommonUtil.MapsFragment;
@@ -93,11 +89,11 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         }
 
         List<String> myResArrayList = Arrays.asList(myResArray);
-        ArrayList<String> navArray = new ArrayList<String>(myResArrayList);
+        ArrayList<String> navArray = new ArrayList<>(myResArrayList);
 
 
         navList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        adapter = new ArrayAdapter<String>(this,R.layout.layout_listitem,navArray);
+        adapter = new ArrayAdapter<>(this,R.layout.layout_listitem,navArray);
         navList.setAdapter(adapter);
         navList.setOnItemClickListener(this);
 
@@ -110,7 +106,9 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
     }
 
     private void loadSelection(int i) {
+        FragmentTransaction fragmentTransaction;
         navList.setItemChecked(i,true);
+
         switch (i) {
             case CommonUtil.GreetingFragment:
                 GreetingFragment greetingFragment = new GreetingFragment();
@@ -226,7 +224,7 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         toast.setView(layout);
         toast.show();
     }
-    public final static boolean isValidEmail(CharSequence email) {
+    public static boolean isValidEmail(CharSequence email) {
         if (email == null) {
             return false;
         } else {

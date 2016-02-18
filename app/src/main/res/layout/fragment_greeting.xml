@@ -21,7 +21,8 @@
         android:drawableTop="@drawable/ic_menu_icon"
         android:src="@drawable/ic_menu_icon"
             android:onClick="onClickMenu"
-            android:clickable="true" />
+            android:clickable="true"
+            android:contentDescription="@string/app_name"/>
 
 
 
@@ -99,7 +100,8 @@
         android:layout_marginLeft="41dp"
         android:scaleType="fitXY"
         android:clickable="true"
-        android:onClick="onClickGoButton"/>
+        android:onClick="onClickGoButton"
+        android:contentDescription="@string/app_name"/>
 
 </RelativeLayout>
 </ScrollView>
