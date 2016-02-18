@@ -103,6 +103,9 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
 
         fragmentManager = getSupportFragmentManager();
 
+        if (!isNetworkConnectionAvailable()) {
+            showCustomToast(R.drawable.no_internet_connection_banner_r);
+        }
         loadSelection(FragmentToBeLoaded);
     }
 
@@ -110,21 +113,18 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         navList.setItemChecked(i,true);
         switch (i) {
             case CommonUtil.GreetingFragment:
-                //this.getFragmentManager().popBackStack();
                 GreetingFragment greetingFragment = new GreetingFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragmentholder, greetingFragment);
                 fragmentTransaction.commit();
                 break;
             case CommonUtil.MapsFragment:
-                //this.getFragmentManager().popBackStack();
                 MapFragment mapFragment = new MapFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragmentholder,mapFragment);
                 fragmentTransaction.commit();
                 break;
             case CommonUtil.AboutFragment:
-              //  this.getFragmentManager().popBackStack();
                 AboutFragment aboutFragment = new AboutFragment();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragmentholder, aboutFragment);
@@ -199,10 +199,7 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         String lname = lnameEditText.getText().toString();
 
         if( ! isValidEmail(email)){
-
             showCustomToast(R.drawable.invalid_email_banner_r);
-        }else if (!isNetworkConnectionAvailable()){
-            showCustomToast(R.drawable.no_internet_connection_banner_r);
         }else{
             CommonUtil.saveToPreferences(email,fname,lname);
 
@@ -249,8 +246,9 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
            mTracker.setScreenName(TAG);
            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
            mTracker.send(new HitBuilders.EventBuilder()
-                   .setCategory("Application Lauch")
-                   .setAction("Email Link")
+                   .setCategory(getString(R.string.app_launch_categeory))
+                   .setAction(getString(R.string.action_email))
+                   .setLabel(getString(R.string.label_email))
                    .build());
        }
     }
