@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +45,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -91,8 +91,7 @@ public class MapFragment extends Fragment implements
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (container == null) {
             return null;
@@ -102,7 +101,6 @@ public class MapFragment extends Fragment implements
 
         mMapView = (MapView) view.findViewById(R.id.location_map);
         mMapView.onCreate(savedInstanceState);
-
         mMapView.onResume();// needed to get the map to display immediately
 
         // retain this fragment
@@ -131,31 +129,22 @@ public class MapFragment extends Fragment implements
         textViewUserInfo.setText(CommonUtil.getUserName());
 
         textViewAddress = (TextView) view.findViewById(R.id.tv_address);
+
         return view;
 
     }
 
-
-    /*****
-     * Sets up the map if it is possible to do so
-     *****/
     public void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (googleMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            googleMap = mMapView.getMap();
-            // Check if we were successful in obtaining the map.
-            if (googleMap != null)
-                setUpMap();
+            mMapView.getMapAsync(new OnMapReadyCallback() {
+                @Override public void onMapReady(GoogleMap gMap) {
+                    googleMap = gMap;
+                    setUpMap();
+                } });
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the
-     * camera.
-     * This should only be called once and when we are sure that {@link #googleMap}
-     * is not null.
-     */
     private void setUpMap() {
         MapsInitializer.initialize(getActivity());
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -169,7 +158,7 @@ public class MapFragment extends Fragment implements
         mMapView.onResume();
         setUpMapIfNeeded();
         mGoogleApiClient.connect();
-        if (cp != null) {
+        if (cp != null && googleMap!= null) {
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
             cp = null;
         }
@@ -184,9 +173,7 @@ public class MapFragment extends Fragment implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-
         googleMap = null;
-
     }
 
     @Override
@@ -211,8 +198,7 @@ public class MapFragment extends Fragment implements
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
             } else {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSION_ACCESS_FINE_LOCATION);
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
             }
         } else {
             LocationManager mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -232,7 +218,7 @@ public class MapFragment extends Fragment implements
         }
 
     }
-    
+
     private void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
@@ -254,7 +240,7 @@ public class MapFragment extends Fragment implements
 
             public View getInfoWindow(Marker arg0) {
                 View v = getActivity().getLayoutInflater().inflate(R.layout.custom_infowindow, null);
-                TextView textView_address = (TextView)v.findViewById(R.id.info_address);
+                TextView textView_address = (TextView) v.findViewById(R.id.info_address);
                 textView_address.setText(strAdress);
                 return v;
             }
@@ -265,10 +251,12 @@ public class MapFragment extends Fragment implements
             }
         });
 
-        gmapMarker.showInfoWindow();
+
         // For zooming automatically to the Dropped PIN Location
         CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(15).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        gmapMarker.showInfoWindow();
 
         textViewAddress.setText(strAdress);
 
