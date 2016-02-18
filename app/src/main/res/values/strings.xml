@@ -31,7 +31,7 @@
     <string name="email">Email Address</string>
     <string name="fname">First Name</string>
     <string name="lname">Last Name</string>
-    <string name="app_version">Application version: 1.0</string>
+    <string name="app_version">Application version: </string>
     <string name="author">Author: Jhansi Tavva</string>
     <string name="ok">Ok</string>
     <string name="gps_title">Location Services Not Active</string>

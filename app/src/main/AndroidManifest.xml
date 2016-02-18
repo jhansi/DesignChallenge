@@ -21,7 +21,7 @@
         <activity android:name=".NavigationDrawerActivity"
             android:configChanges="orientation|screenSize">
             <!-- Accepts URIs that begin with "http://www.android.designchallenge.com/greetings” -->
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"></action>
 
                 <category android:name="android.intent.category.DEFAULT"></category>

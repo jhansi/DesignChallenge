@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
@@ -29,7 +30,7 @@ import android.view.ViewGroup;
  */
 public class AboutFragment extends Fragment {
 
-
+    private static View view;
     public AboutFragment() {
         // Required empty public constructor
     }
@@ -38,10 +39,14 @@ public class AboutFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         // retain this fragment
         setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_about, container, false);
+
+        String versionName = BuildConfig.VERSION_NAME;
+        view = inflater.inflate(R.layout.fragment_about, container, false);
+        TextView textViewVersion = (TextView)view.findViewById(R.id.versionTextView );
+        textViewVersion.append(versionName);
+        return view;
     }
 
 }
