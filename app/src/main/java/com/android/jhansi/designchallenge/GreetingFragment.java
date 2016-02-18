@@ -48,8 +48,9 @@ public class GreetingFragment extends Fragment {
         mTracker.setScreenName(TAG);
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("Greetings")
-                .setAction("View")
+                .setCategory(getString(R.string.category_greetings))
+                .setAction(getString(R.string.action_greetings))
+                .setLabel(getString(R.string.label_greetings))
                 .build());
     }
 

@@ -7,5 +7,6 @@
     <color name="textColor">#76C4D5</color>
     <color name="edittext_background">#445C62</color>
     <color name="map_title_background">#363636</color>
+    <color name="nav_list_textcolor">#93CDC3</color>
 
 </resources>

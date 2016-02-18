@@ -4,7 +4,10 @@ android:id="@+id/label"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:padding="10dip"
-android:textSize="30dip"
+android:textSize="30sp"
 android:textStyle="bold"
-    android:textColor="#93CDC3">
+    android:textColor="@color/nav_list_textcolor"
+    >
 </TextView>
+
+    <!--android:drawableLeft="@drawable/ic_menu_transparent"-->

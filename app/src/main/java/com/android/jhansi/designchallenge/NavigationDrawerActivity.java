@@ -181,14 +181,11 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
         }
 
         drawerLayout.openDrawer(GravityCompat.START);
-        View viewKeyBoard = this.getCurrentFocus();
-        if (viewKeyBoard != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
+        hideKeypad(view);
     }
 
     public void onClickGoButton(View view) {
+        hideKeypad(view);
 
         EditText emailEditText = (EditText) findViewById(R.id.emailEditText);
         EditText fnameEditText = (EditText) findViewById(R.id.fNameEditText);
@@ -246,10 +243,19 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Adapt
            mTracker.setScreenName(TAG);
            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
            mTracker.send(new HitBuilders.EventBuilder()
-                   .setCategory(getString(R.string.app_launch_categeory))
+                   .setCategory(getString(R.string.category_email))
                    .setAction(getString(R.string.action_email))
                    .setLabel(getString(R.string.label_email))
                    .build());
        }
+    }
+
+
+    protected void hideKeypad(View view){
+        View viewKeyBoard = this.getCurrentFocus();
+        if (viewKeyBoard != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
